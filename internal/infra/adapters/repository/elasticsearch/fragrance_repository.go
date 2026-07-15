@@ -2,6 +2,7 @@ package elasticsearch
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/artuos/sniffer/internal/domain"
@@ -53,4 +54,33 @@ func (a *ESFragranceRepositoryAdapter) Create(ctx context.Context, fragrances []
 		}
 	}
 	return nil
+}
+
+func (a *ESFragranceRepositoryAdapter) Search(ctx context.Context, query string) ([]domain.Fragrance, error) {
+	q := elastic.NewBoolQuery().
+		Should(
+			elastic.NewMatchPhrasePrefixQuery("name", query).Boost(2.0),
+			elastic.NewMultiMatchQuery(query, "name^3", "perfumers", "main_accords").
+				Type("best_fields").
+				Fuzziness("AUTO"),
+		).
+		MinimumShouldMatch("1")
+
+	result, err := a.db.Client.Search().
+		Index(indexName).
+		Query(q).
+		Do(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("search: %w", err)
+	}
+
+	var fragrances []domain.Fragrance
+	for _, hit := range result.Hits.Hits {
+		var f domain.Fragrance
+		if err := json.Unmarshal(hit.Source, &f); err != nil {
+			return nil, fmt.Errorf("unmarshal hit: %w", err)
+		}
+		fragrances = append(fragrances, f)
+	}
+	return fragrances, nil
 }
