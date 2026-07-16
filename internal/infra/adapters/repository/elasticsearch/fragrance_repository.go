@@ -118,3 +118,39 @@ func extractTermsAgg(result *elastic.SearchResult, name string) map[string]int {
 	}
 	return m
 }
+
+func (a *ESFragranceRepositoryAdapter) SearchSimilar(ctx context.Context, id string, size int) ([]domain.Fragrance, error) {
+	mlt := elastic.NewMoreLikeThisQuery().
+		Field("name", "description", "main_accords").
+		LikeItems(
+			elastic.NewMoreLikeThisQueryItem().
+				Index(indexName).
+				Id(id),
+		).
+		MinTermFreq(1).
+		MaxQueryTerms(12).
+		MinDocFreq(2)
+
+	q := elastic.NewBoolQuery().
+		Must(mlt).
+		MustNot(elastic.NewTermQuery("_id", id))
+
+	result, err := a.db.Client.Search().
+		Index(indexName).
+		Query(q).
+		Size(size).
+		Do(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("find similar: %w", err)
+	}
+
+	fragrances := make([]domain.Fragrance, 0, len(result.Hits.Hits))
+	for _, hit := range result.Hits.Hits {
+		var f domain.Fragrance
+		if err := json.Unmarshal(hit.Source, &f); err != nil {
+			return nil, fmt.Errorf("unmarshal hit: %w", err)
+		}
+		fragrances = append(fragrances, f)
+	}
+	return fragrances, nil
+}
