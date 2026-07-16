@@ -56,25 +56,38 @@ func (a *ESFragranceRepositoryAdapter) Create(ctx context.Context, fragrances []
 	return nil
 }
 
-func (a *ESFragranceRepositoryAdapter) Search(ctx context.Context, query string) ([]domain.Fragrance, error) {
-	q := elastic.NewBoolQuery().
-		Should(
-			elastic.NewMatchPhrasePrefixQuery("name", query).Boost(2.0),
-			elastic.NewMultiMatchQuery(query, "name^3", "perfumers", "main_accords").
+func (a *ESFragranceRepositoryAdapter) Search(ctx context.Context, params domain.SearchParams) (*domain.SearchResponse, error) {
+	q := elastic.NewBoolQuery()
+
+	if params.Query != "" {
+		q.Should(
+			elastic.NewMatchPhrasePrefixQuery("name", params.Query).Boost(2.0),
+			elastic.NewMultiMatchQuery(params.Query, "name^3", "perfumers", "main_accords").
 				Type("best_fields").
 				Fuzziness("AUTO"),
-		).
-		MinimumShouldMatch("1")
+		).MinimumShouldMatch("1")
+	}
 
-	result, err := a.db.Client.Search().
+	if params.Gender != "" {
+		q.Filter(elastic.NewTermQuery("gender", params.Gender))
+	}
+	if params.Accord != "" {
+		q.Filter(elastic.NewTermQuery("main_accords", params.Accord))
+	}
+
+	search := a.db.Client.Search().
 		Index(indexName).
 		Query(q).
-		Do(ctx)
+		Size(20).
+		Aggregation("by_gender", elastic.NewTermsAggregation().Field("gender")).
+		Aggregation("by_main_accords", elastic.NewTermsAggregation().Field("main_accords"))
+
+	result, err := search.Do(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("search: %w", err)
 	}
 
-	var fragrances []domain.Fragrance
+	fragrances := make([]domain.Fragrance, 0, len(result.Hits.Hits))
 	for _, hit := range result.Hits.Hits {
 		var f domain.Fragrance
 		if err := json.Unmarshal(hit.Source, &f); err != nil {
@@ -82,5 +95,26 @@ func (a *ESFragranceRepositoryAdapter) Search(ctx context.Context, query string)
 		}
 		fragrances = append(fragrances, f)
 	}
-	return fragrances, nil
+
+	facets := domain.Facets{
+		Gender:      extractTermsAgg(result, "gender"),
+		MainAccords: extractTermsAgg(result, "main_accords"),
+	}
+
+	return &domain.SearchResponse{
+		Results: fragrances,
+		Facets:  facets,
+	}, nil
+}
+
+func extractTermsAgg(result *elastic.SearchResult, name string) map[string]int {
+	buckets, found := result.Aggregations.Terms(name)
+	if !found {
+		return map[string]int{}
+	}
+	m := make(map[string]int, len(buckets.Buckets))
+	for _, b := range buckets.Buckets {
+		m[b.Key.(string)] = int(b.DocCount)
+	}
+	return m
 }

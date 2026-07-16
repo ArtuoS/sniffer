@@ -42,6 +42,6 @@ func (s *Service) IngestFragrances(ctx context.Context, location string) error {
 	return nil
 }
 
-func (s *Service) Search(ctx context.Context, query string) ([]domain.Fragrance, error) {
-	return s.repository.Search(ctx, query)
+func (s *Service) Search(ctx context.Context, params domain.SearchParams) (*domain.SearchResponse, error) {
+	return s.repository.Search(ctx, params)
 }

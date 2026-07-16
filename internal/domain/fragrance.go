@@ -13,3 +13,19 @@ type Fragrance struct {
 	Description string    `json:"description"`
 	URL         string    `json:"url"`
 }
+
+type SearchParams struct {
+	Query  string
+	Gender string
+	Accord string
+}
+
+type Facets struct {
+	Gender      map[string]int `json:"gender"`
+	MainAccords map[string]int `json:"main_accords"`
+}
+
+type SearchResponse struct {
+	Results []Fragrance `json:"results"`
+	Facets  Facets      `json:"facets"`
+}
