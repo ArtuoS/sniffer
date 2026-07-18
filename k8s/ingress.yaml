@@ -4,11 +4,12 @@ metadata:
   name: sniffer-api
   namespace: sniffer
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
-    - http:
+    - host: sniffer.local
+      http:
         paths:
           - path: /
             pathType: Prefix

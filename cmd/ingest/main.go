@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	// defer esIngestor.Close()
+	defer esIngestor.Close()
 
 	esIngestor.CreateIndex(ctx, "fragrances")
 
@@ -28,5 +28,4 @@ func main() {
 	fragranceService.IngestFragrances(ctx, os.Getenv("DATASET_PATH"))
 
 	fmt.Printf("Dataset ingested successfully\n")
-
 }

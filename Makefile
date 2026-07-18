@@ -16,13 +16,15 @@ k8s-build:
 	docker build -t sniffer-api:latest -f Dockerfile .
 
 k8s-deploy:
-	kubectl apply -f k8s/namespace.yaml
-	kubectl apply -f k8s/secret.yaml
-	kubectl apply -f k8s/elasticsearch.yaml
-	kubectl apply -f k8s/elasticvue.yaml
-	kubectl apply -f k8s/deployment.yaml
-	kubectl apply -f k8s/service.yaml
-	kubectl apply -f k8s/ingress.yaml
+	k3s kubectl apply -f k8s/namespace.yaml
+	k3s kubectl apply -f k8s/elasticsearch.yaml
+	k3s kubectl apply -f k8s/deployment.yaml
+	k3s kubectl apply -f k8s/service.yaml
+	k3s kubectl apply -f k8s/ingress.yaml
 
 k8s-delete:
 	kubectl delete namespace sniffer
+
+deploy:
+	k3s kubectl port-forward -n sniffer service/sniffer-api 8081:80 & 
+	cloudflared tunnel --url http://localhost:8081

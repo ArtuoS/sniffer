@@ -66,12 +66,9 @@ spec:
             - name: esdata
               mountPath: /usr/share/elasticsearch/data
           resources:
-            requests:
+            limits:
               memory: "1Gi"
               cpu: "500m"
-            limits:
-              memory: "2Gi"
-              cpu: "1000m"
           readinessProbe:
             httpGet:
               path: /_cluster/health
