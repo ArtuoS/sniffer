@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
-	"github.com/artuos/sniffer/internal/infra/adapters"
+	"github.com/artuos/sniffer/internal/infra/adapters/extractor"
 	"github.com/artuos/sniffer/internal/infra/adapters/repository/elasticsearch"
-	"github.com/artuos/sniffer/internal/schemas"
-	"github.com/artuos/sniffer/internal/services"
+	schema "github.com/artuos/sniffer/internal/schema/fragrance"
+	"github.com/artuos/sniffer/internal/service/fragrance"
 )
 
 func main() {
@@ -21,10 +22,10 @@ func main() {
 	esIngestor.CreateIndex(ctx, "fragrances")
 
 	fragranceRepo := elasticsearch.NewESFragranceRepositoryAdapter(esIngestor)
-	ingestDataset := adapters.NewIngestDatasetAdapter[schemas.FragranceModel]()
-	fragranceService := services.NewService(fragranceRepo, ingestDataset)
+	ingestDataset := extractor.NewIngestDatasetAdapter[schema.FragranceModel]()
+	fragranceService := fragrance.NewService(fragranceRepo, ingestDataset)
 
-	fragranceService.IngestFragrances(ctx, "/mnt/d/Distros/Ubuntu/Programs/Projects/sniffer/dataset/fra_perfumes.csv")
+	fragranceService.IngestFragrances(ctx, os.Getenv("DATASET_PATH"))
 
 	fmt.Printf("Dataset ingested successfully\n")
 

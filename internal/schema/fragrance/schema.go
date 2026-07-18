@@ -1,11 +1,11 @@
-package schemas
+package fragrance
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/artuos/sniffer/internal/domain"
+	domain "github.com/artuos/sniffer/internal/domain/fragrance"
 	"github.com/google/uuid"
 )
 

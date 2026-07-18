@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/artuos/sniffer/internal/domain"
+	domain "github.com/artuos/sniffer/internal/domain/fragrance"
 	"github.com/olivere/elastic/v7"
 )
 

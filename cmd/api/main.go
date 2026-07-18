@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
-	"github.com/gin-gonic/gin"
-
-	httpHandler "github.com/artuos/sniffer/internal/http"
+	fragranceHttp "github.com/artuos/sniffer/internal/http/fragrance"
 	"github.com/artuos/sniffer/internal/infra/adapters/repository/elasticsearch"
-	"github.com/artuos/sniffer/internal/services"
+	"github.com/artuos/sniffer/internal/service/fragrance"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -22,14 +22,23 @@ func main() {
 	defer esClient.Close()
 
 	repo := elasticsearch.NewESFragranceRepositoryAdapter(esClient)
-	svc := services.NewService(repo, nil)
-	handler := httpHandler.NewHandler(svc)
+	svc := fragrance.NewService(repo, nil)
+	handler := fragranceHttp.NewHandler(svc)
 
 	r := gin.Default()
 	handler.RegisterRoutes(r)
 
-	fmt.Println("API server running on :8081")
-	if err := r.Run(":8081"); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081"
+	}
+
+	fmt.Printf("API server running on :%s\n", port)
+	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("start server: %v", err)
 	}
+}
+
+func registerRoutes(r *gin.Engine) {
+
 }

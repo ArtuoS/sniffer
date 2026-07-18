@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/artuos/sniffer/internal/domain"
+	domain "github.com/artuos/sniffer/internal/domain/fragrance"
 )
 
 type FragranceRepositoryPort interface {

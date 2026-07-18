@@ -3,6 +3,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/olivere/elastic/v7"
 )
@@ -12,8 +13,13 @@ type ESClientAdapter struct {
 }
 
 func NewESClientAdapter(ctx context.Context) (*ESClientAdapter, error) {
+	esURL := os.Getenv("ELASTICSEARCH_URL")
+	if esURL == "" {
+		esURL = "http://localhost:9200"
+	}
+
 	client, err := elastic.NewSimpleClient(
-		elastic.SetURL("http://localhost:9200"),
+		elastic.SetURL(esURL),
 		elastic.SetSniff(false),
 		elastic.SetHealthcheck(true),
 	)
@@ -21,7 +27,7 @@ func NewESClientAdapter(ctx context.Context) (*ESClientAdapter, error) {
 		return nil, fmt.Errorf("create elastic client: %w", err)
 	}
 
-	info, code, err := client.Ping("http://localhost:9200").Do(ctx)
+	info, code, err := client.Ping(esURL).Do(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("ping elasticsearch: %w", err)
 	}

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sniffer-api
+  namespace: sniffer
+  labels:
+    app: sniffer-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sniffer-api
+  template:
+    metadata:
+      labels:
+        app: sniffer-api
+    spec:
+      containers:
+        - name: api
+          image: sniffer-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8081
+          env:
+            - name: ELASTICSEARCH_URL
+              value: "http://elasticsearch:9200"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sniffer-secrets
+                  key: openai-api-key
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"

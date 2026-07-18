@@ -1,12 +1,11 @@
-package handler
+package fragrance
 
 import (
 	"context"
 	"net/http"
 
+	domain "github.com/artuos/sniffer/internal/domain/fragrance"
 	"github.com/gin-gonic/gin"
-
-	"github.com/artuos/sniffer/internal/domain"
 )
 
 type Service interface {
@@ -19,13 +18,16 @@ type Handler struct {
 }
 
 func NewHandler(service Service) *Handler {
-	return &Handler{service: service}
+	return &Handler{
+		service: service,
+	}
 }
 
-func (h *Handler) RegisterRoutes(r *gin.Engine) {
-	v1 := r.Group("/api/v1")
-	v1.GET("/fragrances/search", h.Search)
-	v1.GET("/fragrances/:id/similar", h.SearchSimilar)
+func (h *Handler) RegisterRoutes(r *gin.Engine) *gin.RouterGroup {
+	v1 := r.Group("/api/v1/fragrances")
+	v1.GET("/search", h.Search)
+	v1.GET("/:id/similar", h.SearchSimilar)
+	return v1
 }
 
 func (h *Handler) Search(c *gin.Context) {
