@@ -1,4 +1,4 @@
-.PHONY: build run-api run-ingest lint k8s-build k8s-deploy k8s-delete
+.PHONY: build run-api run-ingest lint precommit k8s-build k8s-deploy k8s-delete
 
 build:
 	go build ./...
@@ -11,6 +11,9 @@ run-ingest:
 
 lint:
 	golangci-lint run ./...
+
+precommit:
+	golangci-lint run --fix ./...
 
 k8s-build:
 	docker build -t sniffer-api:latest -f Dockerfile .

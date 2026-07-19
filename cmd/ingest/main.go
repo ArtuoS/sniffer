@@ -27,14 +27,18 @@ func main() {
 	}
 	defer esIngestor.Close()
 
-	esIngestor.CreateIndex(ctx, "fragrances")
+	if err := esIngestor.CreateIndex(ctx, "fragrances"); err != nil {
+		logger.Fatal("failed to create index", zap.Error(err))
+	}
 
 	fragranceRepo := elasticsearch.NewESFragranceRepositoryAdapter(esIngestor)
 	ingestDataset := extractor.NewIngestDatasetAdapter[schema.FragranceModel]()
 	kaggleDL := downloader.NewKaggleDownloader()
 	fragranceService := fragrance.NewService(fragranceRepo, ingestDataset, kaggleDL)
 
-	fragranceService.IngestFragrancesFromKaggle(ctx, os.Getenv("KAGGLE_DATASET_URL"))
+	if err := fragranceService.IngestFragrancesFromKaggle(ctx, os.Getenv("KAGGLE_DATASET_URL")); err != nil {
+		logger.Fatal("failed to ingest dataset", zap.Error(err))
+	}
 
 	logger.Info("dataset ingested successfully")
 }

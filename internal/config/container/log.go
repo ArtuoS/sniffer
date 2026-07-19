@@ -21,5 +21,5 @@ func GetLogger() *zap.Logger {
 }
 
 func SyncLogger() {
-	logger.Sync()
+	_ = logger.Sync()
 }

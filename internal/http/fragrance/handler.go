@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const errKey = "error"
+
 type Service interface {
 	Search(ctx context.Context, params domain.SearchParams) (*domain.SearchResponse, error)
 	SearchSimilar(ctx context.Context, id string) ([]domain.Fragrance, error)
@@ -38,13 +40,13 @@ func (h *Handler) Search(c *gin.Context) {
 	}
 
 	if params.Query == "" && params.Gender == "" && params.Accord == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "at least one of 'q', 'gender', or 'accord' is required"})
+		c.JSON(http.StatusBadRequest, gin.H{errKey: "at least one of 'q', 'gender', or 'accord' is required"})
 		return
 	}
 
 	resp, err := h.service.Search(c.Request.Context(), params)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{errKey: err.Error()})
 		return
 	}
 
@@ -54,13 +56,13 @@ func (h *Handler) Search(c *gin.Context) {
 func (h *Handler) SearchSimilar(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "path parameter 'id' is required"})
+		c.JSON(http.StatusBadRequest, gin.H{errKey: "path parameter 'id' is required"})
 		return
 	}
 
 	results, err := h.service.SearchSimilar(c.Request.Context(), id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{errKey: err.Error()})
 		return
 	}
 

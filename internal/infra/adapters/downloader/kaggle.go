@@ -30,7 +30,7 @@ func (d *KaggleDownloader) FetchCSV(ctx context.Context, datasetURL string) (*by
 	if err != nil {
 		return nil, fmt.Errorf("download dataset: %w", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("download failed with status %d", resp.StatusCode)
@@ -53,7 +53,7 @@ func (d *KaggleDownloader) FetchCSV(ctx context.Context, datasetURL string) (*by
 			if err != nil {
 				return nil, fmt.Errorf("open csv in zip: %w", err)
 			}
-			defer rc.Close()
+			defer rc.Close() //nolint:errcheck
 
 			csvBytes, err := io.ReadAll(rc)
 			if err != nil {
