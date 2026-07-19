@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/artuos/sniffer/internal/config/container"
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/olivere/elastic/v7"
+	"go.uber.org/zap"
 )
 
 type ESClientAdapter struct {
 	Client *elastic.Client
+	logger *zap.Logger
 }
 
 func NewESClientAdapter(ctx context.Context) (*ESClientAdapter, error) {
 	esURL := os.Getenv("ELASTICSEARCH_URL")
-	if esURL == "" {
-		esURL = "http://localhost:9200"
-	}
-
 	client, err := elastic.NewSimpleClient(
 		elastic.SetURL(esURL),
 		elastic.SetSniff(false),
@@ -32,10 +32,14 @@ func NewESClientAdapter(ctx context.Context) (*ESClientAdapter, error) {
 		return nil, fmt.Errorf("ping elasticsearch: %w", err)
 	}
 
-	fmt.Printf("Elasticsearch returned code %d, version: %s\n", code, info.Version.Number)
+	logger.Info("elasticsearch connected",
+		zap.Int("status_code", code),
+		zap.String("version", info.Version.Number),
+	)
 
 	return &ESClientAdapter{
 		Client: client,
+		logger: container.GetLogger(),
 	}, nil
 }
 
