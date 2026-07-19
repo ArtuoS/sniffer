@@ -13,19 +13,3 @@ type Fragrance struct {
 	RatingValue float64   `json:"rating_value"`
 	RatingCount int64     `json:"rating_count"`
 }
-
-type SearchParams struct {
-	Query  string
-	Gender string
-	Accord string
-}
-
-type Facets struct {
-	Gender      map[string]int `json:"gender"`
-	MainAccords map[string]int `json:"main_accords"`
-}
-
-type SearchResponse struct {
-	Facets  Facets      `json:"facets"`
-	Results []Fragrance `json:"results"`
-}

@@ -5,13 +5,14 @@ import (
 	"net/http"
 
 	domain "github.com/artuos/sniffer/internal/domain/fragrance"
+	schema "github.com/artuos/sniffer/internal/schema/fragrance"
 	"github.com/gin-gonic/gin"
 )
 
 const errKey = "error"
 
 type Service interface {
-	Search(ctx context.Context, params domain.SearchParams) (*domain.SearchResponse, error)
+	Search(ctx context.Context, params schema.SearchParams) (*schema.SearchResponse, error)
 	SearchSimilar(ctx context.Context, id string) ([]domain.Fragrance, error)
 }
 
@@ -33,7 +34,7 @@ func (h *Handler) RegisterRoutes(r *gin.Engine) *gin.RouterGroup {
 }
 
 func (h *Handler) Search(c *gin.Context) {
-	params := domain.SearchParams{
+	params := schema.SearchParams{
 		Query:  c.Query("q"),
 		Gender: c.Query("gender"),
 		Accord: c.Query("accord"),

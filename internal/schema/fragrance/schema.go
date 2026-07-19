@@ -9,6 +9,22 @@ import (
 	"github.com/google/uuid"
 )
 
+type SearchParams struct {
+	Query  string
+	Gender string
+	Accord string
+}
+
+type Facets struct {
+	Gender      map[string]int `json:"gender"`
+	MainAccords map[string]int `json:"main_accords"`
+}
+
+type SearchResponse struct {
+	Facets  Facets            `json:"facets"`
+	Results []domain.Fragrance `json:"results"`
+}
+
 type FragranceModel struct {
 	Name        string      `csv:"Name"`
 	Gender      string      `csv:"Gender"`

@@ -13,7 +13,7 @@ func LoadEnvs() error {
 	if err != nil {
 		return fmt.Errorf("get working directory: %w", err)
 	}
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		path := filepath.Join(dir, ".env")
 		if _, statErr := os.Stat(path); statErr == nil {
 			return godotenv.Load(path)

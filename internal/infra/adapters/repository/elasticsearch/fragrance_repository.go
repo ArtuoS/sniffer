@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	domain "github.com/artuos/sniffer/internal/domain/fragrance"
+	schema "github.com/artuos/sniffer/internal/schema/fragrance"
 	"github.com/olivere/elastic/v7"
 )
 
@@ -57,7 +58,7 @@ func (a *ESFragranceRepositoryAdapter) Create(ctx context.Context, fragrances []
 	return nil
 }
 
-func (a *ESFragranceRepositoryAdapter) Search(ctx context.Context, params domain.SearchParams) (*domain.SearchResponse, error) {
+func (a *ESFragranceRepositoryAdapter) Search(ctx context.Context, params schema.SearchParams) (*schema.SearchResponse, error) {
 	q := elastic.NewBoolQuery()
 
 	if params.Query != "" {
@@ -72,6 +73,7 @@ func (a *ESFragranceRepositoryAdapter) Search(ctx context.Context, params domain
 	if params.Gender != "" {
 		q.Filter(elastic.NewTermQuery("gender", params.Gender))
 	}
+
 	if params.Accord != "" {
 		q.Filter(elastic.NewTermQuery("main_accords", params.Accord))
 	}
@@ -97,14 +99,12 @@ func (a *ESFragranceRepositoryAdapter) Search(ctx context.Context, params domain
 		fragrances = append(fragrances, f)
 	}
 
-	facets := domain.Facets{
-		Gender:      extractTermsAgg(result, "gender"),
-		MainAccords: extractTermsAgg(result, "main_accords"),
-	}
-
-	return &domain.SearchResponse{
+	return &schema.SearchResponse{
 		Results: fragrances,
-		Facets:  facets,
+		Facets: schema.Facets{
+			Gender:      extractTermsAgg(result, "gender"),
+			MainAccords: extractTermsAgg(result, "main_accords"),
+		},
 	}, nil
 }
 

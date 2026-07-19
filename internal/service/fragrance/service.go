@@ -79,7 +79,7 @@ func (s *Service) IngestFragrancesFromKaggle(ctx context.Context, datasetURL str
 	return nil
 }
 
-func (s *Service) Search(ctx context.Context, params domain.SearchParams) (*domain.SearchResponse, error) {
+func (s *Service) Search(ctx context.Context, params schema.SearchParams) (*schema.SearchResponse, error) {
 	return s.repo.Search(ctx, params)
 }
 
