@@ -32,13 +32,15 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@v7
         with:
-          version:           version: v2.12
-s: [build, lint]
+          version: v2.12
+
+  docker:
+    needs: [build, lint]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: Docker
     steps:
-      - use    environment: Docker
-s: actions/checkout@v7
+      - uses: actions/checkout@v7
 
       - uses: docker/login-action@v4
         with:
@@ -49,5 +51,4 @@ s: actions/checkout@v7
         with:
           context: .
           push: true
-          tags: artu0s/sniffer-api:latest
           tags: artu0s/sniffer:latest
