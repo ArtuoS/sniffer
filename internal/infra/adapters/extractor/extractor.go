@@ -21,7 +21,7 @@ func (i *IngestDatasetAdapter[T]) ConvertToModel(ctx context.Context, loc string
 	if err != nil {
 		return nil, fmt.Errorf("open file: %w", err)
 	}
-	defer f.Close() //nolint:errcheck
+	defer f.Close() //nolint:errcheck // file is read-only, close error is not actionable
 
 	var models []T
 	if err := gocsv.UnmarshalFile(f, &models); err != nil {

@@ -45,8 +45,8 @@ func (s *Service) IngestFragrances(ctx context.Context, location string) error {
 	}
 
 	domainFragrances := make([]domain.Fragrance, 0, len(models))
-	for _, model := range models {
-		domainFragrances = append(domainFragrances, model.ToDomain())
+	for i := range models {
+		domainFragrances = append(domainFragrances, models[i].ToDomain())
 	}
 
 	if err := s.repo.Create(ctx, domainFragrances); err != nil {
@@ -68,8 +68,8 @@ func (s *Service) IngestFragrancesFromKaggle(ctx context.Context, datasetURL str
 	}
 
 	domainFragrances := make([]domain.Fragrance, 0, len(models))
-	for _, model := range models {
-		domainFragrances = append(domainFragrances, model.ToDomain())
+	for i := range models {
+		domainFragrances = append(domainFragrances, models[i].ToDomain())
 	}
 
 	if err := s.repo.Create(ctx, domainFragrances); err != nil {

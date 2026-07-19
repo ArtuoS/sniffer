@@ -3,15 +3,15 @@ package fragrance
 import "github.com/google/uuid"
 
 type Fragrance struct {
-	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Gender      string    `json:"gender"`
-	RatingValue float64   `json:"rating_value"`
-	RatingCount int64     `json:"rating_count"`
-	MainAccords []string  `json:"main_accords"`
 	Perfumers   string    `json:"perfumers"`
 	Description string    `json:"description"`
 	URL         string    `json:"url"`
+	MainAccords []string  `json:"main_accords"`
+	ID          uuid.UUID `json:"id"`
+	RatingValue float64   `json:"rating_value"`
+	RatingCount int64     `json:"rating_count"`
 }
 
 type SearchParams struct {
@@ -26,6 +26,6 @@ type Facets struct {
 }
 
 type SearchResponse struct {
-	Results []Fragrance `json:"results"`
 	Facets  Facets      `json:"facets"`
+	Results []Fragrance `json:"results"`
 }

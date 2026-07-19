@@ -10,15 +10,15 @@ import (
 )
 
 type FragranceModel struct {
-	ID          string      `csv:"-"`
 	Name        string      `csv:"Name"`
 	Gender      string      `csv:"Gender"`
-	RatingValue SafeFloat   `csv:"Rating Value"`
-	RatingCount CommaInt64  `csv:"Rating Count"`
-	MainAccords AccordsList `csv:"Main Accords"`
+	ID          string      `csv:"-"`
 	Perfumers   string      `csv:"Perfumers"`
 	Description string      `csv:"Description"`
 	URL         string      `csv:"url"`
+	MainAccords AccordsList `csv:"Main Accords"`
+	RatingValue SafeFloat   `csv:"Rating Value"`
+	RatingCount CommaInt64  `csv:"Rating Count"`
 }
 
 func parseOrCreateUUID(id string) uuid.UUID {

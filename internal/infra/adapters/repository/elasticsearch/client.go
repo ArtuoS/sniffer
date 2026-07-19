@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/artuos/sniffer/internal/config/container"
-	"github.com/bytedance/gopkg/util/logger"
 	"github.com/olivere/elastic/v7"
 	"go.uber.org/zap"
 )
@@ -32,14 +31,15 @@ func NewESClientAdapter(ctx context.Context) (*ESClientAdapter, error) {
 		return nil, fmt.Errorf("ping elasticsearch: %w", err)
 	}
 
-	logger.Info("elasticsearch connected",
+	l := container.GetLogger()
+	l.Info("elasticsearch connected",
 		zap.Int("status_code", code),
 		zap.String("version", info.Version.Number),
 	)
 
 	return &ESClientAdapter{
 		Client: client,
-		logger: container.GetLogger(),
+		logger: l,
 	}, nil
 }
 
@@ -49,8 +49,8 @@ func (a *ESClientAdapter) CreateIndex(ctx context.Context, indexName string) err
 		return fmt.Errorf("check index exists: %w", err)
 	}
 	if exists {
-		if _, err := a.Client.DeleteIndex(indexName).Do(ctx); err != nil {
-			return fmt.Errorf("delete existing index: %w", err)
+		if _, delErr := a.Client.DeleteIndex(indexName).Do(ctx); delErr != nil {
+			return fmt.Errorf("delete existing index: %w", delErr)
 		}
 	}
 

@@ -19,7 +19,7 @@ func NewKaggleDownloader() *KaggleDownloader {
 }
 
 func (d *KaggleDownloader) FetchCSV(ctx context.Context, datasetURL string) (*bytes.Reader, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, datasetURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, datasetURL, http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -30,7 +30,7 @@ func (d *KaggleDownloader) FetchCSV(ctx context.Context, datasetURL string) (*by
 	if err != nil {
 		return nil, fmt.Errorf("download dataset: %w", err)
 	}
-	defer resp.Body.Close() //nolint:errcheck
+	defer resp.Body.Close() //nolint:errcheck // read-only body, close error is not actionable
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("download failed with status %d", resp.StatusCode)
@@ -53,9 +53,9 @@ func (d *KaggleDownloader) FetchCSV(ctx context.Context, datasetURL string) (*by
 			if err != nil {
 				return nil, fmt.Errorf("open csv in zip: %w", err)
 			}
-			defer rc.Close() //nolint:errcheck
 
 			csvBytes, err := io.ReadAll(rc)
+			_ = rc.Close()
 			if err != nil {
 				return nil, fmt.Errorf("read csv from zip: %w", err)
 			}

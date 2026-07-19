@@ -39,7 +39,8 @@ func NewESFragranceRepositoryAdapter(client *ESClientAdapter) *ESFragranceReposi
 func (a *ESFragranceRepositoryAdapter) Create(ctx context.Context, fragrances []domain.Fragrance) error {
 	bulk := a.db.Client.Bulk().Index(indexName)
 
-	for _, doc := range fragrances {
+	for i := range fragrances {
+		doc := &fragrances[i]
 		bulk.Add(elastic.NewBulkIndexRequest().Id(doc.ID.String()).Doc(doc))
 		if bulk.NumberOfActions() >= 500 {
 			if _, err := bulk.Do(ctx); err != nil {
