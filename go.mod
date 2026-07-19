@@ -3,7 +3,7 @@ module github.com/artuos/sniffer
 go 1.26.4
 
 require (
-	github.com/bytedance/gopkg v0.1.3
+	github.com/bytedance/gopkg v0.1.4
 	github.com/gin-gonic/gin v1.12.0
 	github.com/gocarina/gocsv v0.0.0-20260628180327-50907998929c
 	github.com/google/uuid v1.6.0
