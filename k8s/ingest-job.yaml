@@ -17,8 +17,8 @@ spec:
       restartPolicy: Never
       containers:
         - name: ingest
-          image: artu0s/sniffer-api:latest
-          imagePullPolicy: IfNotPresent
+          image: artu0s/sniffer:latest
+          imagePullPolicy: Always
           args: ["--mode=ingest"]
           env:
             - name: ELASTICSEARCH_URL

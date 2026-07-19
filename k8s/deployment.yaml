@@ -18,7 +18,7 @@ spec:
       containers:
         - name: api
           image: artu0s/sniffer:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args: ["--mode=api"]
           ports:
             - containerPort: 8081

@@ -20,5 +20,5 @@ func LoadEnvs() error {
 		}
 		dir = filepath.Dir(dir)
 	}
-	return fmt.Errorf(".env not found after checking 5 parent directories")
+	return nil
 }
