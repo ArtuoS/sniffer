@@ -1,8 +1,5 @@
 version: "2"
 
-run:
-  timeout: 5m
-
 linters:
   enable:
     - bodyclose
@@ -19,23 +16,23 @@ linters:
     - unparam
     - unused
 
-linters-settings:
-  govet:
-    enable-all: true
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - performance
-      - style
-  misspell:
-    locale: US
-  goconst:
-    min-len: 3
-    min-occurrences: 3
+  settings:
+    govet:
+      enable-all: true
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
+    misspell:
+      locale: US
+    goconst:
+      min-len: 3
+      min-occurrences: 3
 
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - goconst
-        - unparam
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - goconst
+          - unparam
