@@ -19,15 +19,16 @@ spec:
         - name: api
           image: artu0s/sniffer:latest
           imagePullPolicy: IfNotPresent
+          args: ["--mode=api"]
           ports:
             - containerPort: 8081
           env:
             - name: ELASTICSEARCH_URL
-              value: "http://elasticsearch:9200"
+              valueFrom:
+                secretKeyRef:
+                  name: sniffer-secrets
+                  key: ELASTICSEARCH_URL
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "100m"
             limits:
               memory: "256Mi"
               cpu: "500m"

@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sniffer-ingest
+  namespace: sniffer
+  labels:
+    app: sniffer-ingest
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: sniffer-ingest
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: ingest
+          image: artu0s/sniffer-api:latest
+          imagePullPolicy: IfNotPresent
+          args: ["--mode=ingest"]
+          env:
+            - name: ELASTICSEARCH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sniffer-secrets
+                  key: ELASTICSEARCH_URL
+            - name: KAGGLE_DATASET_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sniffer-secrets
+                  key: KAGGLE_DATASET_URL
+            - name: KAGGLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sniffer-secrets
+                  key: KAGGLE_KEY
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"

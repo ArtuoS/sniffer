@@ -34,3 +34,4 @@ go.work.sum
 roadmap.md
 dataset
 __debug*
+secrets.yaml

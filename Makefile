@@ -1,13 +1,13 @@
-.PHONY: build run-api run-ingest lint precommit k8s-build k8s-deploy k8s-delete
+.PHONY: build run lint precommit k8s-build k8s-deploy k8s-delete k8s-ingest
 
 build:
 	go build ./...
 
 run-api:
-	go run ./cmd/api
+	go run ./cmd/sniffer --mode=api
 
 run-ingest:
-	go run ./cmd/ingest
+	go run ./cmd/sniffer --mode=ingest
 
 lint:
 	golangci-lint run ./...
@@ -21,13 +21,18 @@ k8s-build:
 k8s-deploy:
 	k3s kubectl apply -f k8s/namespace.yaml
 	k3s kubectl apply -f k8s/elasticsearch.yaml
+	k3s kubectl apply -f k8s/secrets.yaml
 	k3s kubectl apply -f k8s/deployment.yaml
 	k3s kubectl apply -f k8s/service.yaml
 	k3s kubectl apply -f k8s/ingress.yaml
+
+k8s-ingest:
+	k3s kubectl delete job sniffer-ingest -n sniffer --ignore-not-found
+	k3s kubectl apply -f k8s/ingest-job.yaml
 
 k8s-delete:
 	kubectl delete namespace sniffer
 
 deploy:
-	k3s kubectl port-forward -n sniffer service/sniffer-api 8081:80 & 
+	k3s kubectl port-forward -n sniffer service/sniffer-api 8081:80 &
 	cloudflared tunnel --url http://localhost:8081
